@@ -1,6 +1,17 @@
 import { UTApi } from "uploadthing/server";
 
-const utapi = new UTApi();
+let utapi: UTApi | null = null;
+
+function getUTApi(): UTApi {
+  if (!utapi) {
+    // Check if UploadThing credentials are configured
+    if (!process.env.UPLOADTHING_SECRET) {
+      throw new Error("UPLOADTHING_SECRET is not configured");
+    }
+    utapi = new UTApi();
+  }
+  return utapi;
+}
 
 export interface UploadedFile {
   url: string;
@@ -9,7 +20,8 @@ export interface UploadedFile {
 }
 
 export async function uploadSubmissionFile(file: File): Promise<UploadedFile> {
-  const result = await utapi.uploadFiles(file);
+  const api = getUTApi();
+  const result = await api.uploadFiles(file);
 
   if (!result.data) {
     throw new Error(result.error?.message ?? "Failed to upload file");

@@ -32,10 +32,18 @@ export const POST = withAuth(async (request, user) => {
     let fileSize: number | null = null;
 
     if (file) {
-      const uploaded = await uploadSubmissionFile(file);
-      fileUrl = uploaded.url;
-      fileName = uploaded.name;
-      fileSize = uploaded.size;
+      try {
+        const uploaded = await uploadSubmissionFile(file);
+        fileUrl = uploaded.url;
+        fileName = uploaded.name;
+        fileSize = uploaded.size;
+      } catch (uploadError) {
+        console.error("File upload error:", uploadError);
+        return NextResponse.json(
+          { error: "Failed to upload file. Please check UploadThing configuration." },
+          { status: 500 },
+        );
+      }
     }
 
     const submission = await prisma.submission.create({
