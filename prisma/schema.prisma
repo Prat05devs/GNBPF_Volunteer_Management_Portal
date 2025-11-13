@@ -1,0 +1,117 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  VOLUNTEER
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  NEEDS_REVISION
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  role         Role     @default(VOLUNTEER)
+  avatar       String?
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  attendances  Attendance[]
+  assignedTasks Task[]  @relation("AssignedTasks")
+  createdTasks  Task[]  @relation("CreatedTasks")
+  submissions   Submission[]
+
+  @@index([email])
+  @@index([role])
+}
+
+model Attendance {
+  id              String    @id @default(cuid())
+  userId          String
+  checkInTime     DateTime
+  checkOutTime    DateTime?
+  durationMinutes Int?
+  date            DateTime
+  notes           String?   @db.Text
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, date])
+  @@index([date])
+}
+
+model Task {
+  id          String     @id @default(cuid())
+  title       String
+  description String     @db.Text
+  status      TaskStatus @default(PENDING)
+  priority    Priority   @default(MEDIUM)
+  dueDate     DateTime
+
+  assignedTo  String
+  createdBy   String
+
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  assignedToUser User     @relation("AssignedTasks", fields: [assignedTo], references: [id], onDelete: Cascade)
+  createdByUser  User     @relation("CreatedTasks", fields: [createdBy], references: [id], onDelete: Cascade)
+  submissions    Submission[]
+
+  @@index([assignedTo, status])
+  @@index([status, priority])
+  @@index([dueDate])
+}
+
+model Submission {
+  id           String       @id @default(cuid())
+  taskId       String
+  userId       String
+  content      String?      @db.Text
+  fileUrl      String?
+  fileName     String?
+  fileSize     Int?
+  reviewStatus ReviewStatus @default(PENDING)
+  reviewNotes  String?      @db.Text
+  reviewedBy   String?
+
+  submittedAt  DateTime     @default(now())
+  reviewedAt   DateTime?
+
+  task         Task         @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+  @@index([userId])
+  @@index([reviewStatus])
+}
+
