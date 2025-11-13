@@ -41,7 +41,7 @@ export default async function TasksPage() {
   return (
     <TasksClient
       currentUser={user}
-      initialTasks={tasks.map((task) => ({
+      initialTasks={tasks.map((task: any) => ({
         id: task.id,
         title: task.title,
         description: task.description,
@@ -49,18 +49,17 @@ export default async function TasksPage() {
         priority: task.priority,
         dueDate: task.dueDate.toISOString(),
         assignedTo: {
-          id: task.assignedToUser.id,
-          name: task.assignedToUser.name,
-          email: task.assignedToUser.email,
+          id: task.assignedToUser?.id || task.assignedTo,
+          name: task.assignedToUser?.name || "Unknown",
+          email: task.assignedToUser?.email || "",
         },
         createdBy: {
-          id: task.createdByUser.id,
-          name: task.createdByUser.name,
+          id: task.createdByUser?.id || task.createdBy,
+          name: task.createdByUser?.name || "Unknown",
         },
-        submissionCount: task.submissions.length,
+        submissionCount: task.submissions?.length || 0,
       }))}
       volunteers={users}
     />
   );
 }
-

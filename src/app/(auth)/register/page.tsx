@@ -13,8 +13,6 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { registerSchema } from "@/lib/validations/auth";
 
-type RegisterValues = z.infer<typeof registerSchema>;
-
 const extendedRegisterSchema = registerSchema.extend({
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {

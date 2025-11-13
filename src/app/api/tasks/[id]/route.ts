@@ -5,8 +5,11 @@ import { prisma } from "@/lib/db";
 import { withAuth } from "@/lib/rbac";
 import { updateTaskSchema } from "@/lib/validations/task";
 
-export const GET = withAuth(async (_request, user, { params }) => {
-  const { id } = params;
+export const GET = withAuth(async (_request, user, context) => {
+  const { id } = context?.params || {};
+  if (!id) {
+    return NextResponse.json({ error: "Missing ID" }, { status: 400 });
+  }
 
   const task = await prisma.task.findUnique({
     where: { id },
@@ -51,9 +54,13 @@ export const GET = withAuth(async (_request, user, { params }) => {
   });
 });
 
-export const PATCH = withAuth(async (request, user, { params }) => {
+export const PATCH = withAuth(async (request, user, context) => {
   try {
-    const { id } = params;
+    const { id } = context?.params || {};
+    if (!id) {
+      return NextResponse.json({ error: "Missing ID" }, { status: 400 });
+    }
+    
     const body = await request.json();
     const validated = updateTaskSchema.parse(body);
 
@@ -108,8 +115,11 @@ export const PATCH = withAuth(async (request, user, { params }) => {
 });
 
 export const DELETE = withAuth(
-  async (_request, _user, { params }) => {
-    const { id } = params;
+  async (_request, _user, context) => {
+    const { id } = context?.params || {};
+    if (!id) {
+      return NextResponse.json({ error: "Missing ID" }, { status: 400 });
+    }
 
     const task = await prisma.task.findUnique({
       where: { id },

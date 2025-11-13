@@ -9,7 +9,8 @@ import {
   type ControllerProps,
   type FieldPath,
   type FieldValues,
-  useFormContext,
+  type ControllerFieldState,
+  type UseFormStateReturn,
 } from "react-hook-form";
 
 import { cn } from "@/lib/utils";
@@ -36,8 +37,8 @@ const FormItemContext = React.createContext<{
   formItemId?: string;
   formDescriptionId?: string;
   formMessageId?: string;
-  fieldState: ReturnType<typeof useFormContext>["formState"]["errors"][string];
-  formState: ReturnType<typeof useFormContext>["formState"];
+  fieldState: ControllerFieldState;
+  formState: UseFormStateReturn<FieldValues>;
 } | null>(null);
 
 const useFormField = () => {

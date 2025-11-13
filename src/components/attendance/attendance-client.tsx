@@ -92,7 +92,7 @@ export function AttendanceClient({ initialStatus, initialStats, recentRecords }:
         return;
       }
 
-      const data = await response.json();
+      await response.json();
       setStatus({
         isCheckedIn: false,
       });

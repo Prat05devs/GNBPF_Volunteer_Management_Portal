@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 
-import { JWTPayload, verifyToken } from "@/lib/auth";
+import { verifyToken } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 
 export async function getCurrentUser() {

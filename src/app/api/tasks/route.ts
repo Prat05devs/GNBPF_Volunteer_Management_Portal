@@ -54,15 +54,15 @@ export const GET = withAuth(async (request, user) => {
       },
     });
 
-    const tasks = rawTasks.map((task) => ({
+    const tasks = rawTasks.map((task: any) => ({
       ...task,
       dueDate: task.dueDate.toISOString(),
       createdAt: task.createdAt.toISOString(),
       updatedAt: task.updatedAt.toISOString(),
-      submissions: task.submissions.map((submission) => ({
+      submissions: task.submissions?.map((submission: any) => ({
         ...submission,
         submittedAt: submission.submittedAt.toISOString(),
-      })),
+      })) || [],
     }));
 
     const totalPages = Math.ceil(total / limit);

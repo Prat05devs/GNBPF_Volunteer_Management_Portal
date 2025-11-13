@@ -6,9 +6,13 @@ import { withAuth } from "@/lib/rbac";
 import { reviewSubmissionSchema } from "@/lib/validations/submission";
 
 export const PATCH = withAuth(
-  async (request, _user, { params }) => {
+  async (request, _user, context) => {
     try {
-      const { id } = params;
+      const { id } = context?.params || {};
+      if (!id) {
+        return NextResponse.json({ error: "Missing ID" }, { status: 400 });
+      }
+      
       const body = await request.json();
       const validated = reviewSubmissionSchema.parse(body);
 
